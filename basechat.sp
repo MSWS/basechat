@@ -299,10 +299,8 @@ void SendChatToAll(int client, const char[] message) {
         }
         FormatActivitySource(client, i, nameBuf, sizeof(nameBuf));
 
-        if (g_GameEngine == Engine_CSGO)
-            PrintToChat(i, " \x01\x0B\x04%t: %s", "Say all", nameBuf, message);
-        else
-            PrintToChat(i, "\x04%t: \x01%s", "Say all", nameBuf, message);
+        PrintToChat(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x04%t: %s" : "\x04%t: \x01%s", "Say all", "Say all", nameBuf, message);
+        PrintToConsole(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x04%t: %s" : "\x04%t: \x01%s", "Say all", "Say all", nameBuf, message);
     }
 }
 
@@ -321,12 +319,16 @@ void DisplayCenterTextToAll(int client, const char[] message) {
 void SendChatToAdmins(int from, const char[] message) {
     int fromAdmin = CheckCommandAccess(from, "sm_chat", ADMFLAG_CHAT);
     for (int i = 1; i <= MaxClients; i++) {
-        if (IsClientInGame(i) && (from == i || CheckCommandAccess(i, "sm_chat", ADMFLAG_CHAT))) {
-            if (g_GameEngine == Engine_CSGO)
-                PrintToChat(i, " \x01\x0B\x07%t: %s", fromAdmin ? "Chat admins" : "Chat to admins", from, message);
-            else
-                PrintToChat(i, "\x04%t: \x01%s", fromAdmin ? "Chat admins" : "Chat to admins", from, message);
+        if (!IsClientInGame(i))
+            continue;
+        if (CheckCommandAccess(i, "sm_chat", ADMFLAG_CHAT)) {
+            PrintToChat(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", fromAdmin ? "Chat admins" : "Chat to admins-admin", from, message);
+            PrintToConsole(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", fromAdmin ? "Chat admins" : "Chat to admins-admin", from, message);
+            continue;
         }
+        if (from != i)
+            continue;
+        PrintToChat(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", fromAdmin ? "Chat admins" : "Chat to admins-source", from, message);
     }
 }
 
@@ -348,16 +350,11 @@ void SendPrivateChat(int client, int target, const char[] message) {
     if (!client) {
         PrintToServer("(Private to %N) %N: %s", target, client, message);
     } else if (target != client) {
-        if (g_GameEngine == Engine_CSGO)
-            PrintToChat(client, "  \x01\x0B\x07%t: %s", "Private say to", target, client, message);
-        else
-            PrintToChat(client, "\x04%t: \x01%s", "Private say to", target, client, message);
+        PrintToChat(client, g_GameEngine == Engine_CSGO ? "  \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Private say to", target, client, message);
+        PrintToConsole(client, g_GameEngine == Engine_CSGO ? "  \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Private say to", target, client, message);
     }
 
-    if (g_GameEngine == Engine_CSGO)
-        PrintToChat(target, "  \x01\x0B\x07%t: %s", "Private say to", target, client, message);
-    else
-        PrintToChat(target, "\x04%t: \x01%s", "Private say to", target, client, message);
+    PrintToChat(target, g_GameEngine == Engine_CSGO ? "  \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Private say to", target, client, message);
     LogAction(client, target, "\"%L\" triggered sm_psay to \"%L\" (text %s)", client, target, message);
 }
 
