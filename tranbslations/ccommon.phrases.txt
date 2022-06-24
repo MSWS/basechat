@@ -1,5 +1,10 @@
 "Phrases"
 {	
+  "Say all"
+	{
+		"#format"		"{1:s}"
+		"en"			"(ALL) {1}"
+	}
 	"Chat admins"
 	{
 		"#format"		"{1:N}"

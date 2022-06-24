@@ -56,7 +56,7 @@ ConVar g_Cvar_Chatmode;
 EngineVersion g_GameEngine = Engine_Unknown;
 
 public void OnPluginStart() {
-    LoadTranslations("common.phrases");
+    LoadTranslations("ccommon.phrases");
 
     g_GameEngine = GetEngineVersion();
 
