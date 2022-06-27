@@ -27,5 +27,5 @@ jobs:
       - name: Compile basechat
         run: |
           echo -e "\nCompiling basechat.sp..."
-          spcomp -i $includePath -i $INCLUDE_PATH basechat.sp
+          spcomp basechat.sp
         working-directory: '/tmp'
