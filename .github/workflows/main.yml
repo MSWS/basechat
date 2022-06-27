@@ -3,7 +3,7 @@ name: Compile with SourceMod
 on: 
   push:
     branches:
-     - *
+     - '*'
   pull_request:
     branches:
      - main
