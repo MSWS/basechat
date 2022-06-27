@@ -19,14 +19,6 @@ jobs:
         SM_VERSION: [ "1.10", "1.11" ]
     steps:
       - uses: actions/checkout@v1
-
-      - name: Set environment variables
-        run: |
-          SOURCEMOD_PATH=$GITHUB_WORKSPACE/addons/sourcemod
-          echo "SOURCEMOD_PATH=$SOURCEMOD_PATH" >> $GITHUB_ENV
-          echo "SCRIPTING_PATH=$SOURCEMOD_PATH/scripting" >> $GITHUB_ENV
-          echo "INCLUDE_PATH=$SOURCEMOD_PATH/scripting/include" >> $GITHUB_ENV
-
       - name: Setup SourcePawn Compiler ${{ matrix.SM_VERSION }}
         uses: rumblefrog/setup-sp@master
         with:
@@ -36,4 +28,4 @@ jobs:
         run: |
           echo -e "\nCompiling basechat.sp..."
           spcomp -i $includePath -i $INCLUDE_PATH basechat.sp
-        working-directory: ${{ env.SCRIPTING_PATH }}/
+        working-directory: '/tmp'
