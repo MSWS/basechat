@@ -53,7 +53,6 @@ EngineVersion g_GameEngine = Engine_Unknown;
 int g_iClients[MAXPLAYERS + 1];
 
 public void OnPluginStart() {
-    LoadTranslations("ccommon.phrases");
     LoadTranslations("common.phrases");
 
     g_GameEngine = GetEngineVersion();
