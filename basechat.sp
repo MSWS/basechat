@@ -255,14 +255,19 @@ void SendChatToAdmins(int from, const char[] message) {
         if (!IsClientInGame(i) || !IsValidEntity(i))
             continue;
         if (CheckCommandAccess(i, "sm_chat", ADMFLAG_CHAT)) {
-            PrintToChat(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", fromAdmin ? "Chat admins" : "Chat to admins-admin", id, from, message);
-            PrintToConsole(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", fromAdmin ? "Chat admins" : "Chat to admins-admin", id, from, message);
+            if (fromAdmin) {
+                PrintToChat(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Chat admins", from, message);
+                PrintToConsole(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Chat admins", from, message);
+            } else {
+                PrintToChat(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Chat to admins-admin", id, from, message);
+                PrintToConsole(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Chat to admins-admin", id, from, message);
+            }
             continue;
         }
         if (from != i)
             continue;
-        PrintToChat(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", fromAdmin ? "Chat admins" : "Chat to admins-source", id, from, message);
-        PrintToConsole(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", fromAdmin ? "Chat admins" : "Chat to admins-source", id, from, message);
+        PrintToChat(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Chat to admins-source", id, from, message);
+        PrintToConsole(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Chat to admins-source", id, from, message);
     }
     LogAction(from, -1, "\"%L\" triggered sm_chat (text %s)", from, message);
 }

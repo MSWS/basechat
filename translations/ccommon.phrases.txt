@@ -7,8 +7,8 @@
 	}
 	"Chat admins"
 	{
-		"#format"		"{1:d},{2:N}"
-		"en"			"(ADMINS) {2}"
+		"#format"		"{1:N}"
+		"en"			"(ADMINS) {1}"
 	}
 	
 	"Chat to admins-admin"
@@ -19,8 +19,8 @@
 	
 	"Chat to admins-source"
 	{
-		"#format"		"{1:d},{2:N}"
-		"en"			"(TO ADMINS) {2}"
+		"#format"		"{1:N}"
+		"en"			"(TO ADMINS) {1}"
 	}
 
 	"Private say to"
