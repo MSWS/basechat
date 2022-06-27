@@ -68,6 +68,9 @@ public void OnPluginStart() {
 
 public void OnClientDisconnect(int client) {
     g_iClients[client] = 0;
+    for (int i = 1; i <= MaxClients; i++)
+        if (g_iClients[i] == client)
+            g_iClients[i] = 0;
 }
 
 public Action OnClientSayCommand(int client, const char[] command, const char[] sArgs) {
