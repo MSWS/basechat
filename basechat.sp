@@ -258,10 +258,10 @@ void DisplayCenterTextToAll(int client, const char[] message) {
 }
 
 void SendChatToAdmins(int from, const char[] message) {
-    int fromAdmin = CheckCommandAccess(from, "sm_chat", ADMFLAG_CHAT);
+    bool fromAdmin = CheckCommandAccess(from, "sm_chat", ADMFLAG_CHAT);
     int id        = GetClientUserId(from);
     for (int i = 1; i <= MaxClients; i++) {
-        if (!IsClientInGame(i))
+        if (!IsClientInGame(i) || !IsValidEntity(i))
             continue;
         if (CheckCommandAccess(i, "sm_chat", ADMFLAG_CHAT)) {
             PrintToChat(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", fromAdmin ? "Chat admins" : "Chat to admins-admin", id, from, message);
