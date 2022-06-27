@@ -50,18 +50,25 @@ public Plugin myinfo =
 
 EngineVersion g_GameEngine = Engine_Unknown;
 
+int g_iClients[MAXPLAYERS + 1];
+
 public void OnPluginStart() {
     LoadTranslations("ccommon.phrases");
+    LoadTranslations("common.phrases");
 
     g_GameEngine = GetEngineVersion();
 
+    RegConsoleCmd("sm_chat", Command_SmChat, "Contact / chat with admins");
+
     RegAdminCmd("sm_say", Command_SmSay, ADMFLAG_CHAT, "sm_say <message> - sends message to all players");
     RegAdminCmd("sm_csay", Command_SmCsay, ADMFLAG_CHAT, "sm_csay <message> - sends centered message to all players");
-
     RegAdminCmd("sm_hsay", Command_SmHsay, ADMFLAG_CHAT, "sm_hsay <message> - sends hint message to all players");
-    RegAdminCmd("sm_chat", Command_SmChat, ADMFLAG_CHAT, "sm_chat <message> - sends message to admins");
     RegAdminCmd("sm_psay", Command_SmPsay, ADMFLAG_CHAT, "sm_psay <name or #userid> <message> - sends private message");
     RegAdminCmd("sm_msay", Command_SmMsay, ADMFLAG_CHAT, "sm_msay <message> - sends message as a menu panel");
+}
+
+public void OnClientDisconnect(int client) {
+    g_iClients[client] = 0;
 }
 
 public Action OnClientSayCommand(int client, const char[] command, const char[] sArgs) {
@@ -97,7 +104,13 @@ public Action OnClientSayCommand(int client, const char[] command, const char[] 
 
         int len    = BreakString(sArgs[startidx], arg, sizeof(arg));
         int target = FindTarget(client, arg, true, false);
-
+        if (StrEqual(arg, "r", false)) {
+            target = g_iClients[client];
+            if (!IsValidEntity(target) || !IsClientConnected(target)) {
+                PrintToChat(client, "[SM] That player disconnected.");
+                return Plugin_Stop;
+            }
+        }
         if (target == -1 || len == -1)
             return Plugin_Stop;
 
@@ -240,9 +253,8 @@ void DisplayCenterTextToAll(int client, const char[] message) {
     char nameBuf[MAX_NAME_LENGTH];
 
     for (int i = 1; i <= MaxClients; i++) {
-        if (!IsClientInGame(i) || IsFakeClient(i)) {
+        if (!IsClientInGame(i) || IsFakeClient(i))
             continue;
-        }
         FormatActivitySource(client, i, nameBuf, sizeof(nameBuf));
         PrintCenterText(i, "%s: %s", nameBuf, message);
     }
@@ -266,8 +278,8 @@ void SendChatToAdmins(int from, const char[] message) {
         }
         if (from != i)
             continue;
-        PrintToChat(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Chat to admins-source", id, from, message);
-        PrintToConsole(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Chat to admins-source", id, from, message);
+        PrintToChat(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Chat to admins-source", from, message);
+        PrintToConsole(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Chat to admins-source", from, message);
     }
     LogAction(from, -1, "\"%L\" triggered sm_chat (text %s)", from, message);
 }
@@ -280,6 +292,7 @@ void SendPrivateChat(int client, int target, const char[] message) {
         PrintToConsole(client, g_GameEngine == Engine_CSGO ? "  \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Private say to", target, client, message);
     }
 
+    g_iClients[client] = target;
     PrintToChat(target, g_GameEngine == Engine_CSGO ? "  \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Private say to", target, client, message);
     LogAction(client, target, "\"%L\" triggered sm_psay to \"%L\" (text %s)", client, target, message);
 }
