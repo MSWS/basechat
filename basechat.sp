@@ -71,58 +71,49 @@ public Action OnClientSayCommand(int client, const char[] command, const char[] 
 
     startidx++;
     bool admin = CheckCommandAccess(client, "sm_say", ADMFLAG_CHAT);
-    if (StrEqual(command, "say", false)) {
-        if (sArgs[startidx] != CHAT_SYMBOL || !admin) {
-            if (admin) {
-                // sm_say alias
-                SendChatToAll(client, sArgs[startidx]);
-                LogAction(client, -1, "\"%L\" triggered sm_say (text %s)", client, sArgs[startidx]);
-                return Plugin_Stop;
-            }
-
-            // sm_chat alias
-            SendChatToAdmins(client, sArgs[startidx]);
-            LogAction(client, -1, "\"%L\" triggered sm_chat (text %s)", client, sArgs[startidx]);
+    bool team  = StrEqual(command, "say_team");
+    if (!team && !StrEqual(command, "say"))
+        return Plugin_Continue;
+    if (sArgs[startidx] != CHAT_SYMBOL || !admin) {
+        if (admin && !team) {
+            // sm_say alias
+            SendChatToAll(client, sArgs[startidx]);
+            LogAction(client, -1, "\"%L\" triggered sm_say (text %s)", client, sArgs[startidx]);
             return Plugin_Stop;
         }
 
-        startidx++;
-
-        if (sArgs[startidx] != CHAT_SYMBOL && admin) {
-            // sm_psay alias
-
-            char arg[64];
-
-            int len    = BreakString(sArgs[startidx], arg, sizeof(arg));
-            int target = FindTarget(client, arg, true, false);
-
-            if (target == -1 || len == -1)
-                return Plugin_Stop;
-
-            SendPrivateChat(client, target, sArgs[startidx + len]);
-            return Plugin_Stop;
-        }
-
-        startidx++;
-
-        // sm_csay alias
-        if (!admin)
-            return Plugin_Stop;
-
-        DisplayCenterTextToAll(client, sArgs[startidx]);
-        LogAction(client, -1, "\"%L\" triggered sm_csay (text %s)", client, sArgs[startidx]);
-        return Plugin_Stop;
-    }
-    if (StrEqual(command, "say_team", false) || StrEqual(command, "say_squad", false)) {
-        if (!admin)
-            return Plugin_Continue;
-
+        // sm_chat alias
         SendChatToAdmins(client, sArgs[startidx]);
         LogAction(client, -1, "\"%L\" triggered sm_chat (text %s)", client, sArgs[startidx]);
         return Plugin_Stop;
     }
 
-    return Plugin_Continue;
+    startidx++;
+
+    if (sArgs[startidx] != CHAT_SYMBOL && admin) {
+        // sm_psay alias
+
+        char arg[64];
+
+        int len    = BreakString(sArgs[startidx], arg, sizeof(arg));
+        int target = FindTarget(client, arg, true, false);
+
+        if (target == -1 || len == -1)
+            return Plugin_Stop;
+
+        SendPrivateChat(client, target, sArgs[startidx + len]);
+        return Plugin_Stop;
+    }
+
+    startidx++;
+
+    // sm_csay alias
+    if (!admin)
+        return Plugin_Stop;
+
+    DisplayCenterTextToAll(client, sArgs[startidx]);
+    LogAction(client, -1, "\"%L\" triggered sm_csay (text %s)", client, sArgs[startidx]);
+    return Plugin_Stop;
 }
 
 public Action Command_SmSay(int client, int args) {
@@ -259,7 +250,7 @@ void DisplayCenterTextToAll(int client, const char[] message) {
 
 void SendChatToAdmins(int from, const char[] message) {
     bool fromAdmin = CheckCommandAccess(from, "sm_chat", ADMFLAG_CHAT);
-    int id        = GetClientUserId(from);
+    int id         = GetClientUserId(from);
     for (int i = 1; i <= MaxClients; i++) {
         if (!IsClientInGame(i) || !IsValidEntity(i))
             continue;
@@ -270,7 +261,7 @@ void SendChatToAdmins(int from, const char[] message) {
         }
         if (from != i)
             continue;
-        PrintToChat(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", fromAdmin ? "Chat admins" : "Chat to admins-source", from, message);
+        PrintToChat(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", fromAdmin ? "Chat admins" : "Chat to admins-source", id, from, message);
     }
 }
 
