@@ -1,26 +1,25 @@
-name: Main Workflow
+name: SourceMod Plugin Workflow
 
-on: [push]
+on:
+  push:
+    branches:
+    - '*'
+  pull_request:
+    branches:
+    - 'main'
 
 jobs:
-  run:
-    name: Run action
-    runs-on: ${{ matrix.operating-systems }}
-    strategy:
-      matrix:
-        operating-systems: [ubuntu-latest, windows-latest, macos-latest]
+  build:
 
+    runs-on: ubuntu-latest
+    
     steps:
     - uses: actions/checkout@v1
-    
-    - name: Setup SourcePawn Compiler
-      uses: rumblefrog/setup-sp@master
-      with:
-        version: "1.11.x"
-      
-      # For some reason, mac compiler doesn't use the include directory in which the compiler is in
-    - name: Verify compiler
+    - name: Download sourcemod
       run: |
-        which spcomp
-        echo $includePath
-        spcomp -i$includePath __tests__/compile.sp
+        wget "http://www.sourcemod.net/latest.php?version=1.10&os=linux" -O sourcemod.tar.gz
+        tar -xzf sourcemod.tar.gz
+    - name: Give spcomp the required permissions
+      run: chmod +x addons/sourcemod/scripting/spcomp
+    - name: Compiling the plugin
+      run: addons/sourcemod/scripting/spcomp -E basechat.sp
