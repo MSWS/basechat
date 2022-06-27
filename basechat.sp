@@ -262,7 +262,9 @@ void SendChatToAdmins(int from, const char[] message) {
         if (from != i)
             continue;
         PrintToChat(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", fromAdmin ? "Chat admins" : "Chat to admins-source", id, from, message);
+        PrintToConsole(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", fromAdmin ? "Chat admins" : "Chat to admins-source", id, from, message);
     }
+    LogAction(from, -1, "\"%L\" triggered sm_chat (text %s)", from, message);
 }
 
 void SendPrivateChat(int client, int target, const char[] message) {
