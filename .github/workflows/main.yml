@@ -1,25 +1,25 @@
-name: Compile with SourceMod
+name: SourceMod Plugin Workflow
 
-on: 
+on:
   push:
     branches:
-     - '*'
+    - '*'
   pull_request:
     branches:
-     - main
+    - 'main'
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        sm-version: [ '1.10.x', '1.11.x ']
 
-    name: SM version ${{ matrix.sm-version }}
+    runs-on: ubuntu-latest
+    
     steps:
-      - uses: actions/checkout@v1
-      - name: Setup SP ${{ matrix.SM_VERSION }}
-        uses: rumblefrog/setup-sp@master
-        with:
-          version: ${{ matrix.sm-version }}
-      - run: spcomp basechat.sp
+    - uses: actions/checkout@v1
+    - name: Download sourcemod
+      run: |
+        wget "http://www.sourcemod.net/latest.php?version=1.10&os=linux" -O sourcemod.tar.gz
+        tar -xzf sourcemod.tar.gz
+    - name: Give spcomp the required permissions
+      run: chmod +x addons/sourcemod/scripting/spcomp
+    - name: Compiling the plugin
+      run: addons/sourcemod/scripting/spcomp -E basechat.sp
