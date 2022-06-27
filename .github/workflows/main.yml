@@ -1,25 +1,26 @@
-name: Compile with SourceMod
+name: Main Workflow
 
-on: 
-  push:
-    branches:
-     - '*'
-  pull_request:
-    branches:
-     - main
+on: [push]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  run:
+    name: Run action
+    runs-on: ${{ matrix.operating-systems }}
     strategy:
       matrix:
-        sm-version: [ '1.10.x', '1.11.x ']
+        operating-systems: [ubuntu-latest, windows-latest, macos-latest]
 
-    name: SM version ${{ matrix.sm-version }}
     steps:
-      - uses: actions/checkout@v1
-      - name: Setup SP ${{ matrix.SM_VERSION }}
-        uses: rumblefrog/setup-sp@master
-        with:
-          version: ${{ matrix.sm-version }}
-      - run: spcomp basechat.sp
+    - uses: actions/checkout@v1
+    
+    - name: Setup SourcePawn Compiler
+      uses: rumblefrog/setup-sp@master
+      with:
+        version: "1.11.x"
+      
+      # For some reason, mac compiler doesn't use the include directory in which the compiler is in
+    - name: Verify compiler
+      run: |
+        which spcomp
+        echo $includePath
+        spcomp -i$includePath __tests__/compile.sp
