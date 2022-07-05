@@ -298,13 +298,11 @@ void SendPrivateChat(int client, int target, const char[] message) {
     if (!client)
         PrintToServer("(Private to %N) %N: %s", target, client, message);
 
-    if (target != client) {
-        for (int i = 1; i <= MaxClients; i++) {
-            if (!CheckCommandAccess(i, "", ADMFLAG_CHAT, true))
-                continue;
-            PrintToChat(i, g_GameEngine == Engine_CSGO ? "  \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Private say to", target, client, message);
-            PrintToConsole(i, g_GameEngine == Engine_CSGO ? "  \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Private say to", target, client, message);
-        }
+    for (int i = 1; i <= MaxClients; i++) {
+        if (!CheckCommandAccess(i, "", ADMFLAG_CHAT, true) && i != client && i != target)
+            continue;
+        PrintToChat(i, g_GameEngine == Engine_CSGO ? "  \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Private say to", target, client, message);
+        PrintToConsole(i, g_GameEngine == Engine_CSGO ? "  \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Private say to", target, client, message);
     }
 
     g_iClients[client] = target;
