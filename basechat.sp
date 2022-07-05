@@ -108,7 +108,7 @@ public Action OnClientSayCommand(int client, const char[] command, const char[] 
         int target = FindTarget(client, arg, true, false);
         if (StrEqual(arg, "r", false)) {
             target = g_iClients[client];
-            if (!IsValidEntity(target) || !IsClientConnected(target)) {
+            if (target == 0 || !IsValidEntity(target) || !IsClientConnected(target)) {
                 PrintToChat(client, "[SM] That player disconnected.");
                 return Plugin_Stop;
             }
@@ -214,6 +214,14 @@ public Action Command_SmPsay(int client, int args) {
 
     int target = FindTarget(client, arg, true, false);
 
+    if (StrEqual(arg, "r", false)) {
+        target = g_iClients[client];
+        if (target == 0 || !IsValidEntity(target) || !IsClientConnected(target)) {
+            PrintToChat(client, "[SM] That player disconnected.");
+            return Plugin_Stop;
+        }
+    }
+
     if (target == -1)
         return Plugin_Handled;
 
@@ -287,16 +295,19 @@ void SendChatToAdmins(int from, const char[] message) {
 }
 
 void SendPrivateChat(int client, int target, const char[] message) {
-    if (!client) {
+    if (!client)
         PrintToServer("(Private to %N) %N: %s", target, client, message);
-    } else if (target != client) {
-        PrintToChat(client, g_GameEngine == Engine_CSGO ? "  \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Private say to", target, client, message);
-        PrintToConsole(client, g_GameEngine == Engine_CSGO ? "  \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Private say to", target, client, message);
+
+    if (target != client) {
+        for (int i = 1; i <= MaxClients; i++) {
+            if (!CheckCommandAccess(i, "", ADMFLAG_CHAT, true))
+                continue;
+            PrintToChat(i, g_GameEngine == Engine_CSGO ? "  \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Private say to", target, client, message);
+            PrintToConsole(i, g_GameEngine == Engine_CSGO ? "  \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Private say to", target, client, message);
+        }
     }
 
     g_iClients[client] = target;
-    PrintToChat(target, g_GameEngine == Engine_CSGO ? "  \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Private say to", target, client, message);
-    LogAction(client, target, "\"%L\" triggered sm_psay to \"%L\" (text %s)", client, target, message);
 }
 
 void SendPanelToAll(int from, char[] message) {
