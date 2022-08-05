@@ -105,14 +105,15 @@ public Action OnClientSayCommand(int client, const char[] command, const char[] 
         char arg[64];
 
         int len    = BreakString(sArgs[startidx], arg, sizeof(arg));
-        int target = FindTarget(client, arg, true, false);
+        int target = -1;
         if (StrEqual(arg, "r", false)) {
             target = g_iClients[client];
             if (target == 0 || !IsValidEntity(target) || !IsClientConnected(target)) {
                 PrintToChat(client, "[SM] That player disconnected.");
                 return Plugin_Stop;
             }
-        }
+        } else
+            target = FindTarget(client, arg, true, false);
         if (target == -1 || len == -1)
             return Plugin_Stop;
 
