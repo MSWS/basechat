@@ -10,9 +10,7 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-    
     steps:
     - uses: actions/checkout@v1
     - name: Download sourcemod
@@ -22,4 +20,4 @@ jobs:
     - name: Give spcomp the required permissions
       run: chmod +x addons/sourcemod/scripting/spcomp
     - name: Compiling the plugin
-      run: addons/sourcemod/scripting/spcomp -E basechat.sp
+      run: addons/sourcemod/scripting/spcomp -E addons/sourcemod/scripting/basechat.sp

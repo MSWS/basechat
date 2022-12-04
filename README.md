@@ -1,6 +1,11 @@
 # EdgeGamers Customized Basechat
 A deriviation of the original [basechat included in SourceMod](https://github.com/alliedmodders/sourcemod/blob/master/plugins/basechat.sp).
 
+# Installation
+1. Delete (or move to disabled/) the original sourcemod basechat.smx file from your `plugins` folder.
+2. Compile and move the `basechat.smx` file into the `plugins` folder.
+3. Combine the `Chat to admins-admin` and `Chat to admins-source` phrases from `addons/sourcemod/translations` into your `common.phrases.txt` file (or copy the file completely).
+
 ## Features
 - Includes UID of players when they contact admins.
 - Overhauls team/all channels to be consistent between both.
