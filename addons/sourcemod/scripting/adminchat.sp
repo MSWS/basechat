@@ -49,14 +49,10 @@ public Plugin myinfo =
 
 #define CHAT_SYMBOL '@'
 
-EngineVersion g_GameEngine = Engine_Unknown;
-
 int g_iClients[MAXPLAYERS + 1];
 
 public void OnPluginStart() {
     LoadTranslations("adminchat.phrases");
-
-    g_GameEngine = GetEngineVersion();
 
     RegConsoleCmd("sm_chat", Command_SmChat, "Contact / chat with admins");
 
