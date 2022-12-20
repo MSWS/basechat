@@ -1,5 +1,5 @@
 # EdgeGamers Customized Basechat
-A deriviation of the original [basechat included in SourceMod](https://github.com/alliedmodders/sourcemod/blob/master/plugins/basechat.sp).
+A derivation of the original [basechat included in SourceMod](https://github.com/alliedmodders/sourcemod/blob/master/plugins/basechat.sp).
 
 # Installation
 1. Delete (or move to disabled/) the original sourcemod basechat.smx file from your `plugins` folder.
