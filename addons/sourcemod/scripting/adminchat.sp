@@ -283,7 +283,7 @@ void SendChatToAdmins(int from, const char[] message) {
     strcopy(msgFromAdminConsole, sizeof(msgFromAdminConsole), msgFromAdmin);
     CRemoveTags(msgFromAdminConsole, sizeof(msgFromAdminConsole));
 
-    Format(msgFromAdminAdmin, sizeof(msgFromAdminAdmin), "%t: %s", "Chat admins-admin", id, from, message);
+    Format(msgFromAdminAdmin, sizeof(msgFromAdminAdmin), "%t: %s", "Chat to admins-admin", id, from, message);
     strcopy(msgFromAdminAdminConsole, sizeof(msgFromAdminAdminConsole), msgFromAdminAdmin);
     CRemoveTags(msgFromAdminAdminConsole, sizeof(msgFromAdminAdminConsole));
 
