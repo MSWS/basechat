@@ -246,14 +246,18 @@ public Action Command_SmMsay(int client, int args) {
 
 void SendChatToAll(int client, const char[] message) {
     char nameBuf[MAX_NAME_LENGTH];
+    char msg[256], msgConsole[256];
+    Format(msg, sizeof(msg), "%t: %s", "Say all", nameBuf, message);
+    strcopy(msgConsole, sizeof(msgConsole), msg);
+    CRemoveTags(msgConsole, sizeof(msgConsole));
 
     for (int i = 1; i <= MaxClients; i++) {
         if (!IsClientInGame(i) || IsFakeClient(i))
             continue;
         FormatActivitySource(client, i, nameBuf, sizeof(nameBuf));
 
-        CPrintToChat(i, "%t: %s", "Say all", nameBuf, message);
-        PrintToConsole(i, "%t: %s", "Say all", nameBuf, message);
+        CPrintToChat(i, msg);
+        PrintToConsole(i, msgConsole);
     }
 }
 
@@ -271,23 +275,39 @@ void DisplayCenterTextToAll(int client, const char[] message) {
 void SendChatToAdmins(int from, const char[] message) {
     bool fromAdmin = CheckCommandAccess(from, "", ADMFLAG_CHAT, true);
     int id         = GetClientUserId(from);
+    char msgFromAdmin[256], msgFromAdminConsole[256];
+    char msgFromAdminAdmin[256], msgFromAdminAdminConsole[256];
+    char msgFromAdminSource[256], msgFromAdminSourceConsole[256];
+
+    Format(msgFromAdmin, sizeof(msgFromAdmin), "%t: %s", "Chat admins", from, message);
+    strcopy(msgFromAdminConsole, sizeof(msgFromAdminConsole), msgFromAdmin);
+    CRemoveTags(msgFromAdminConsole, sizeof(msgFromAdminConsole));
+
+    Format(msgFromAdminAdmin, sizeof(msgFromAdminAdmin), "%t: %s", "Chat admins-admin", id, from, message);
+    strcopy(msgFromAdminAdminConsole, sizeof(msgFromAdminAdminConsole), msgFromAdminAdmin);
+    CRemoveTags(msgFromAdminAdminConsole, sizeof(msgFromAdminAdminConsole));
+
+    Format(msgFromAdminSource, sizeof(msgFromAdminSource), "%t: %s", "Chat to admins-source", from, message);
+    strcopy(msgFromAdminSourceConsole, sizeof(msgFromAdminSourceConsole), msgFromAdminSource);
+    CRemoveTags(msgFromAdminSourceConsole, sizeof(msgFromAdminSourceConsole));
+
     for (int i = 1; i <= MaxClients; i++) {
         if (!IsClientInGame(i) || !IsValidEntity(i))
             continue;
         if (CheckCommandAccess(i, "", ADMFLAG_CHAT, true)) {
             if (fromAdmin) {
-                CPrintToChat(i, "%t: %s", "Chat admins", from, message);
-                PrintToConsole(i, "%t: %s", "Chat admins", from, message);
+                CPrintToChat(i, msgFromAdmin);
+                PrintToConsole(i, msgFromAdminConsole);
             } else {
-                CPrintToChat(i, "%t: %s", "Chat admins-admin", id, from, message);
-                PrintToConsole(i, "%t: %s", "Chat admins-admin", id, from, message);
+                CPrintToChat(i, msgFromAdminAdmin);
+                PrintToConsole(i, msgFromAdminAdminConsole);
             }
             continue;
         }
         if (from != i)
             continue;
-        CPrintToChat(i, "%t: %s", "Chat to admins-source", from, message);
-        PrintToConsole(i, "%t: %s", "Chat to admins-source", from, message);
+        CPrintToChat(i, msgFromAdminSource);
+        PrintToConsole(i, msgFromAdminSourceConsole);
     }
     LogAction(from, -1, "\"%L\" triggered sm_chat (text %s)", from, message);
 }
@@ -296,11 +316,16 @@ void SendPrivateChat(int client, int target, const char[] message) {
     if (!client)
         PrintToServer("(Private to %N) %N: %s", target, client, message);
 
+    char msg[256], msgConsole[256];
+    Format(msg, sizeof(msg), "%t: %s", "Private say to", target, client, message);
+    strcopy(msgConsole, sizeof(msgConsole), msg);
+    CRemoveTags(msgConsole, sizeof(msgConsole));
+
     for (int i = 1; i <= MaxClients; i++) {
         if (!CheckCommandAccess(i, "", ADMFLAG_CHAT, true) && i != client && i != target)
             continue;
-        CPrintToChat(i, "%t: %s", "Private say to", target, client, message);
-        PrintToConsole(i, "%t: %s", "Private say to", target, client, message);
+        CPrintToChat(i, msg);
+        PrintToConsole(i, msgConsole);
     }
 
     g_iClients[client] = target;
