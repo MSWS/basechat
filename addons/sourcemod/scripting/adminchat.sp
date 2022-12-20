@@ -34,6 +34,7 @@
 #pragma semicolon 1
 
 #include <sourcemod>
+#include <colorlib>
 
 #pragma newdecls required
 
@@ -48,14 +49,10 @@ public Plugin myinfo =
 
 #define CHAT_SYMBOL '@'
 
-EngineVersion g_GameEngine = Engine_Unknown;
-
 int g_iClients[MAXPLAYERS + 1];
 
 public void OnPluginStart() {
-    LoadTranslations("common.phrases");
-
-    g_GameEngine = GetEngineVersion();
+    LoadTranslations("adminchat.phrases");
 
     RegConsoleCmd("sm_chat", Command_SmChat, "Contact / chat with admins");
 
@@ -254,9 +251,12 @@ void SendChatToAll(int client, const char[] message) {
         if (!IsClientInGame(i) || IsFakeClient(i))
             continue;
         FormatActivitySource(client, i, nameBuf, sizeof(nameBuf));
-
-        PrintToChat(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x04%t: %s" : "\x04%t: \x01%s", "Say all", nameBuf, message);
-        PrintToConsole(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x04%t: %s" : "\x04%t: \x01%s", "Say all", nameBuf, message);
+        char msg[256], msgConsole[256];
+        Format(msg, sizeof(msg), "%t: %s", "Say all", nameBuf, message);
+        strcopy(msgConsole, sizeof(msgConsole), msg);
+        CRemoveTags(msgConsole, sizeof(msgConsole));
+        CPrintToChat(i, msg);
+        PrintToConsole(i, msgConsole);
     }
 }
 
@@ -274,23 +274,39 @@ void DisplayCenterTextToAll(int client, const char[] message) {
 void SendChatToAdmins(int from, const char[] message) {
     bool fromAdmin = CheckCommandAccess(from, "", ADMFLAG_CHAT, true);
     int id         = GetClientUserId(from);
+    char msgFromAdmin[256], msgFromAdminConsole[256];
+    char msgFromAdminAdmin[256], msgFromAdminAdminConsole[256];
+    char msgFromAdminSource[256], msgFromAdminSourceConsole[256];
+
+    Format(msgFromAdmin, sizeof(msgFromAdmin), "%t: %s", "Chat admins", from, message);
+    strcopy(msgFromAdminConsole, sizeof(msgFromAdminConsole), msgFromAdmin);
+    CRemoveTags(msgFromAdminConsole, sizeof(msgFromAdminConsole));
+
+    Format(msgFromAdminAdmin, sizeof(msgFromAdminAdmin), "%t: %s", "Chat to admins-admin", id, from, message);
+    strcopy(msgFromAdminAdminConsole, sizeof(msgFromAdminAdminConsole), msgFromAdminAdmin);
+    CRemoveTags(msgFromAdminAdminConsole, sizeof(msgFromAdminAdminConsole));
+
+    Format(msgFromAdminSource, sizeof(msgFromAdminSource), "%t: %s", "Chat to admins-source", from, message);
+    strcopy(msgFromAdminSourceConsole, sizeof(msgFromAdminSourceConsole), msgFromAdminSource);
+    CRemoveTags(msgFromAdminSourceConsole, sizeof(msgFromAdminSourceConsole));
+
     for (int i = 1; i <= MaxClients; i++) {
         if (!IsClientInGame(i) || !IsValidEntity(i))
             continue;
         if (CheckCommandAccess(i, "", ADMFLAG_CHAT, true)) {
             if (fromAdmin) {
-                PrintToChat(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Chat admins", from, message);
-                PrintToConsole(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Chat admins", from, message);
+                CPrintToChat(i, msgFromAdmin);
+                PrintToConsole(i, msgFromAdminConsole);
             } else {
-                PrintToChat(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Chat to admins-admin", id, from, message);
-                PrintToConsole(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Chat to admins-admin", id, from, message);
+                CPrintToChat(i, msgFromAdminAdmin);
+                PrintToConsole(i, msgFromAdminAdminConsole);
             }
             continue;
         }
         if (from != i)
             continue;
-        PrintToChat(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Chat to admins-source", from, message);
-        PrintToConsole(i, g_GameEngine == Engine_CSGO ? " \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Chat to admins-source", from, message);
+        CPrintToChat(i, msgFromAdminSource);
+        PrintToConsole(i, msgFromAdminSourceConsole);
     }
     LogAction(from, -1, "\"%L\" triggered sm_chat (text %s)", from, message);
 }
@@ -299,11 +315,16 @@ void SendPrivateChat(int client, int target, const char[] message) {
     if (!client)
         PrintToServer("(Private to %N) %N: %s", target, client, message);
 
+    char msg[256], msgConsole[256];
+    Format(msg, sizeof(msg), "%t: %s", "Private say to", target, client, message);
+    strcopy(msgConsole, sizeof(msgConsole), msg);
+    CRemoveTags(msgConsole, sizeof(msgConsole));
+
     for (int i = 1; i <= MaxClients; i++) {
         if (!CheckCommandAccess(i, "", ADMFLAG_CHAT, true) && i != client && i != target)
             continue;
-        PrintToChat(i, g_GameEngine == Engine_CSGO ? "  \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Private say to", target, client, message);
-        PrintToConsole(i, g_GameEngine == Engine_CSGO ? "  \x01\x0B\x07%t: %s" : "\x04%t: \x01%s", "Private say to", target, client, message);
+        CPrintToChat(i, msg);
+        PrintToConsole(i, msgConsole);
     }
 
     g_iClients[client] = target;

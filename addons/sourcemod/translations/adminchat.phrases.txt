@@ -1,0 +1,39 @@
+"Phrases"
+{
+	"Say all"
+	{
+		"#format"		"{1:s}"
+		"en"			"{darkgreen}(ALL) {1}"
+	}
+	
+	"Chat admins"
+	{
+		"#format"		"{1:N}"
+		"en"			"{lightred}(ADMINS) {1}"
+	}
+	
+	"Chat to admins"
+	{
+		"#format"		"{1:N}"
+		"en"			"{lightred}(TO ADMINS) {1}"
+	}
+	
+	"Private say to"
+	{
+		"#format"		"{1:N},{2:N}"
+		"en"			"{lightred}(Private to {1}) {2}"
+	}
+	
+	"Chat to admins-admin"
+	{
+		"#format"		"{1:d},{2:N}"
+		"en"			"{darkred}(TO ADMINS) [#{1}] {lightred}{2}"
+	}
+	
+	"Chat to admins-source"
+	{
+		"#format"		"{1:N}"
+		"en"			"{darkred}(TO ADMINS) {lightred}{1}"
+	}
+
+}
