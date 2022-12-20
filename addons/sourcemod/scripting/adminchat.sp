@@ -246,16 +246,15 @@ public Action Command_SmMsay(int client, int args) {
 
 void SendChatToAll(int client, const char[] message) {
     char nameBuf[MAX_NAME_LENGTH];
-    char msg[256], msgConsole[256];
-    Format(msg, sizeof(msg), "%t: %s", "Say all", nameBuf, message);
-    strcopy(msgConsole, sizeof(msgConsole), msg);
-    CRemoveTags(msgConsole, sizeof(msgConsole));
 
     for (int i = 1; i <= MaxClients; i++) {
         if (!IsClientInGame(i) || IsFakeClient(i))
             continue;
         FormatActivitySource(client, i, nameBuf, sizeof(nameBuf));
-
+        char msg[256], msgConsole[256];
+        Format(msg, sizeof(msg), "%t: %s", "Say all", nameBuf, message);
+        strcopy(msgConsole, sizeof(msgConsole), msg);
+        CRemoveTags(msgConsole, sizeof(msgConsole));
         CPrintToChat(i, msg);
         PrintToConsole(i, msgConsole);
     }
