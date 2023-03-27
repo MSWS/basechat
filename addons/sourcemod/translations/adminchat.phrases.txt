@@ -3,7 +3,7 @@
 	"Say all"
 	{
 		"#format"		"{1:s}"
-		"en"			"{darkgreen}(ALL) {1}"
+		"en"			"{green}(ALL) {1}"
 	}
 	
 	"Chat admins"
