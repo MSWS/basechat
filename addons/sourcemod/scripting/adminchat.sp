@@ -81,16 +81,19 @@ public Action OnClientSayCommand(int client, const char[] command, const char[] 
     if (!team && !StrEqual(command, "say"))
         return Plugin_Continue;
     if (sArgs[startidx] != CHAT_SYMBOL || !admin) {
+        char message[256];
+        strcopy(message, sizeof(message), sArgs[startidx]);
+        CRemoveAllColors(message, sizeof(message));
         if (admin && !team) {
             // sm_say alias
-            SendChatToAll(client, sArgs[startidx]);
-            LogAction(client, -1, "\"%L\" triggered sm_say (text %s)", client, sArgs[startidx]);
+            SendChatToAll(client, message);
+            LogAction(client, -1, "\"%L\" triggered sm_say (text %s)", client, message);
             return Plugin_Stop;
         }
 
         // sm_chat alias
-        SendChatToAdmins(client, sArgs[startidx]);
-        LogAction(client, -1, "\"%L\" triggered sm_chat (text %s)", client, sArgs[startidx]);
+        SendChatToAdmins(client, message);
+        LogAction(client, -1, "\"%L\" triggered sm_chat (text %s)", client, message);
         return Plugin_Stop;
     }
 
@@ -114,7 +117,11 @@ public Action OnClientSayCommand(int client, const char[] command, const char[] 
         if (target == -1 || len == -1)
             return Plugin_Stop;
 
-        SendPrivateChat(client, target, sArgs[startidx + len]);
+        char message[256];
+        strcopy(message, sizeof(message), sArgs[startidx + len]);
+        CRemoveAllColors(message, sizeof(message));
+
+        SendPrivateChat(client, target, message);
         return Plugin_Stop;
     }
 
