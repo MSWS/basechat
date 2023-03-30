@@ -144,6 +144,7 @@ public Action Command_SmSay(int client, int args) {
 
     char text[192];
     GetCmdArgString(text, sizeof(text));
+    CRemoveAllColors(text, sizeof(text));
 
     SendChatToAll(client, text);
     LogAction(client, -1, "\"%L\" triggered sm_say (text %s)", client, text);
@@ -199,6 +200,7 @@ public Action Command_SmChat(int client, int args) {
 
     char text[192];
     GetCmdArgString(text, sizeof(text));
+    CRemoveAllColors(text, sizeof(text));
 
     SendChatToAdmins(client, text);
     LogAction(client, -1, "\"%L\" triggered sm_chat (text %s)", client, text);
@@ -230,6 +232,7 @@ public Action Command_SmPsay(int client, int args) {
     if (target == -1)
         return Plugin_Handled;
 
+    CRemoveAllColors(text, sizeof(text));
     SendPrivateChat(client, target, text[len]);
 
     return Plugin_Handled;
